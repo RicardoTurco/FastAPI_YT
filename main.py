@@ -1,6 +1,6 @@
 import uvicorn
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, Response, Cookie
 from pydantic import BaseModel
 
 
@@ -16,6 +16,31 @@ app = FastAPI()
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+
+# get standard HEADERS
+@app.get("/headers")
+def read_root(user_agent: Optional[str] = Header(None)):
+    return {"user_agent": user_agent}
+
+
+# get HEADERS entered by user
+@app.get("/headers-customized")
+def read_root(my_header: Optional[str] = Header(None)):
+    return {"my-header": my_header}
+
+
+# set COOKIE on browser
+@app.post("/cookie")
+def cookie(response: Response, cookie: Optional[str] = "cookie_standard"):
+    response.set_cookie(key="meucookie", value=cookie)
+    return {"cookie": True}
+
+
+# get COOKIE that was set
+@app.get("/get-cookie")
+def get_cookie(meucookie: Optional[str] = Cookie(None)):
+    return {"cookie": meucookie}
 
 
 @app.get("/items/{item_id}")
